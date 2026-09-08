@@ -1,0 +1,315 @@
+:host {
+  --emerald-dark: #0f382c;
+  --emerald-medium: #1b4d3e;
+  --gold-accent: #c5a059;
+  --gold-light: #e6cb96;
+  --cream-bg: #faf8f5;
+  --text-dark: #1f2824;
+  --glass-bg: rgba(15, 56, 44, 0.75);
+  display: block;
+  font-family: 'Playfair Display', 'Helvetica Neue', serif, sans-serif;
+}
+
+/* --- ISLA FLOTANTE (HEADER) --- */
+.floating-nav {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88%;
+  max-width: 1100px;
+  height: 64px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 1000;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.floating-nav.scrolled {
+  top: 12px;
+  background: rgba(15, 56, 44, 0.95);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.brand-title { color: #fff; font-weight: 700; letter-spacing: 1.5px; font-size: 1rem; }
+.brand-sub { color: var(--gold-accent); font-weight: 600; }
+
+.nav-links { display: flex; gap: 32px; }
+.nav-links a {
+  color: #e2e8f0; text-decoration: none; font-size: 0.9rem; font-family: sans-serif;
+  cursor: pointer; transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--gold-accent); }
+
+.btn-nav-cta {
+  background: linear-gradient(135deg, var(--gold-accent), var(--gold-light));
+  color: var(--emerald-dark); border: none; padding: 10px 20px; border-radius: 20px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: transform 0.2s;
+}
+.btn-nav-cta:hover { transform: translateY(-2px); }
+
+/* --- HERO SECTION --- */
+.hero-container {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 120px 24px 60px;
+}
+
+.hero-bg-image {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1521590832167-7bfcbaa63645?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Efecto Paralaje */
+  z-index: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 56, 44, 0.85) 0%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 700px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.hero-title { font-size: 4rem; line-height: 1.1; font-weight: 600; margin-bottom: 20px; }
+.text-gold { color: var(--gold-accent); font-style: italic; }
+
+.hero-subtitle {
+  font-family: sans-serif; font-size: 1.2rem; color: #e2e8f0; line-height: 1.6; margin: 0 auto 40px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold-accent), var(--gold-light));
+  color: var(--emerald-dark); border: none; padding: 16px 36px; border-radius: 30px;
+  font-size: 1rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  transition: transform 0.3s;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(197, 160, 89, 0.4); }
+
+/* --- SECCIÓN DE PLANES RECTANGULARES --- */
+/* --- SECCIÓN DE PLANES RECTANGULARES (2x2 GRID) --- */
+.planes-section {
+  background-color: var(--cream-bg);
+  padding: 100px 24px;
+  color: var(--text-dark);
+}
+
+.section-header { text-align: center; margin-bottom: 60px; }
+.section-title { font-size: 2.5rem; color: var(--emerald-dark); margin-bottom: 10px; }
+.section-subtitle { font-family: sans-serif; color: #64748b; font-size: 1.1rem; }
+
+/* Contenedor principal 2x2 */
+.planes-container-2x2 {
+  max-width: 1280px; /* Un poco más ancho para acomodar el 2x2 cómodamente */
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.plan-card-rect {
+  display: flex;
+  background: #ffffff;
+  border-radius: 16px; /* Bordes ligeramente más ajustados */
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  position: relative;
+  height: 100%;
+}
+
+.plan-card-rect:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(15, 56, 44, 0.12);
+}
+
+/* Efecto hover en la imagen de la tarjeta */
+.plan-card-rect:hover .plan-image {
+  transform: scale(1.08);
+}
+
+.featured-plan {
+  border: 2px solid var(--gold-accent);
+}
+
+.plan-badge {
+  position: absolute;
+  top: 15px;
+  left: -35px;
+  background: var(--gold-accent);
+  color: #fff;
+  padding: 6px 40px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transform: rotate(-45deg);
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.plan-image-wrapper {
+  width: 32%; /* Imagen un poco más angosta para dar espacio al texto */
+  min-width: 180px;
+  position: relative;
+  overflow: hidden; /* Necesario para que el zoom de la imagen no se salga */
+}
+
+.plan-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease; /* Transición suave para el zoom */
+}
+
+.plan-content {
+  padding: 24px 28px; /* Padding reducido para modo compacto */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribuye el espacio uniformemente */
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.plan-name { font-size: 1.6rem; color: var(--emerald-dark); margin: 0; }
+.plan-price { display: flex; align-items: baseline; gap: 2px; }
+.currency, .period { font-size: 0.85rem; color: #64748b; font-family: sans-serif; }
+.amount { font-size: 2rem; font-weight: 700; color: var(--text-dark); line-height: 1; }
+
+.plan-desc {
+  font-family: sans-serif; font-size: 0.9rem; color: #64748b; margin-bottom: 15px; line-height: 1.4;
+  min-height: 40px; /* Mantiene la alineación aunque el texto varíe */
+}
+
+.plan-features {
+  list-style: none; padding: 0; margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-features li {
+  font-family: sans-serif; font-size: 0.9rem; padding-left: 24px; position: relative; color: var(--text-dark);
+}
+.plan-features li::before {
+  content: '✓'; position: absolute; left: 0; color: var(--gold-accent); font-weight: bold; font-size: 1rem;
+}
+
+.btn-plan-outline, .btn-plan-solid {
+  padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+  align-self: flex-start; font-family: sans-serif; font-size: 0.9rem; margin-top: auto;
+}
+.btn-plan-outline {
+  border: 1px solid var(--emerald-dark); background: transparent; color: var(--emerald-dark);
+}
+.btn-plan-outline:hover { background: var(--emerald-dark); color: #fff; }
+
+.btn-plan-solid {
+  border: none; background: var(--gold-accent); color: var(--emerald-dark); font-weight: 700;
+}
+.btn-plan-solid:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3); }
+
+/* --- ANIMACIONES DE ENTRADA (Muestra en Cascada) --- */
+.animate-card {
+  opacity: 0;
+  animation: cardFadeUp 0.8s ease forwards;
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.3s; }
+.delay-3 { animation-delay: 0.5s; }
+.delay-4 { animation-delay: 0.7s; }
+
+@keyframes cardFadeUp {
+  0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- RESPONSIVE PARA LA CUADRÍCULA --- */
+@media (max-width: 1100px) {
+  /* Si la pantalla se hace más pequeña, apilamos los elementos de la tarjeta para que no se aprieten */
+  .plan-card-rect { flex-direction: column; }
+  .plan-image-wrapper { width: 100%; height: 200px; }
+}
+
+@media (max-width: 768px) {
+  /* En tablets/móviles, pasamos a 1 columna */
+  .planes-container-2x2 { grid-template-columns: 1fr; }
+  .plan-card-rect { flex-direction: row; } /* Volvemos a horizontal si hay espacio vertical */
+  .plan-image-wrapper { width: 30%; height: auto; }
+}
+
+@media (max-width: 600px) {
+  /* Teléfonos pequeños: 1 columna, tarjetas verticales */
+  .plan-card-rect { flex-direction: column; }
+  .plan-image-wrapper { width: 100%; height: 200px; }
+  .plan-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+/* --- FOOTER --- */
+.footer-section { position: relative; padding: 80px 24px 20px; color: #fff; overflow: hidden; }
+.footer-bg-image {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover; background-position: center; background-attachment: fixed; z-index: 1; filter: grayscale(100%);
+}
+.footer-overlay { position: absolute; inset: 0; background: rgba(15, 56, 44, 0.92); z-index: 2; }
+.footer-content {
+  position: relative; z-index: 3; max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 40px;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.3); padding-bottom: 40px; justify-content: space-between;
+}
+.footer-brand .brand-title { font-size: 1.5rem; margin-bottom: 10px; }
+.footer-brand .brand-slogan { font-family: sans-serif; color: #cbd5e1; font-size: 0.9rem; max-width: 300px; }
+.footer-links { display: flex; gap: 60px; }
+.link-column h4 { color: var(--gold-accent); margin-bottom: 20px; }
+.link-column a { display: block; font-family: sans-serif; color: #cbd5e1; margin-bottom: 10px; cursor: pointer; }
+.link-column a:hover { color: #fff; }
+.footer-bottom { position: relative; z-index: 3; text-align: center; padding-top: 20px; font-family: sans-serif; font-size: 0.85rem; color: #94a3b8; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+  .plan-card-rect { flex-direction: column; }
+  .plan-image-wrapper { width: 100%; height: 250px; }
+  .plan-features { grid-template-columns: 1fr; }
+  .plan-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .plan-badge { left: -40px; top: 30px; }
+  .hero-title { font-size: 3rem; }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .footer-links { flex-direction: column; gap: 30px; }
+}
+
+/* ANIMACIONES */
+.animate-slide-up { animation: slideUp 0.8s ease forwards; }
+.animate-slide-up-delay { animation: slideUp 0.8s 0.2s ease forwards; opacity: 0; }
+.animate-fade-in-delay { animation: fadeIn 1s 0.4s ease forwards; opacity: 0; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { to { opacity: 1; } }
