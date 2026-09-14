@@ -1,0 +1,82 @@
+.simulador-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.banco-card {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.banco-header {
+  background: #0056b3;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.banco-header h2 { margin: 0 0 5px 0; font-size: 20px; }
+.banco-header p { margin: 0; font-size: 13px; opacity: 0.8; }
+
+.detalle-pago { padding: 20px; }
+.detalle-pago h3 { color: #333; margin-top: 0; margin-bottom: 20px; text-align: center; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+.fila-detalle {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 15px;
+  color: #555;
+}
+
+.fila-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px dashed #ddd;
+}
+
+.monto-grande {
+  font-size: 24px;
+  color: #d32f2f;
+}
+
+.btn-pagar {
+  width: calc(100% - 40px);
+  margin: 0 20px 20px 20px;
+  padding: 16px;
+  background: #008f39;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.logo-exito {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  margin: 0 auto 20px auto;
+  display: block;
+}
+
+.btn-pagar:hover { background: #00702d; }
+.btn-pagar.procesando { background: #6c757d; cursor: wait; }
+
+.mensaje-exito { text-align: center; padding: 20px; color: #333; }
+.check { font-size: 50px; margin-bottom: 10px; }
+.mensaje-exito small { color: #666; display: block; margin-top: 15px; }
+.cargando { text-align: center; padding: 40px; color: #666; }

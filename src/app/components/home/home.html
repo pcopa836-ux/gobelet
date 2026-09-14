@@ -45,90 +45,44 @@
 
   <div class="planes-container-2x2">
     
-    <div class="plan-card-rect animate-card delay-1">
-      <div class="plan-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop" alt="Plan Básico" class="plan-image">
-      </div>
-      <div class="plan-content">
-        <div class="plan-header">
-          <h3 class="plan-name">Básico</h3>
-          <div class="plan-price">
-            <span class="currency">Bs.</span><span class="amount">99</span><span class="period">/mes</span>
-          </div>
-        </div>
-        <p class="plan-desc">Perfecto para estilistas independientes en su primer paso digital.</p>
-        <ul class="plan-features">
-          <li>Agenda digital 24/7</li>
-          <li>Hasta 50 citas al mes</li>
-          <li>1 Perfil de estilista</li>
-        </ul>
-        <button class="btn-plan-outline">Seleccionar Básico</button>
-      </div>
-    </div>
+    <!-- Iteramos sobre los servicios traídos de Firebase -->
+    @for (servicio of servicios; track servicio.id; let i = $index) {
+      <!-- Agregamos la clase delay dinámicamente y destacamos el segundo elemento (índice 1) -->
+      <div class="plan-card-rect animate-card delay-{{ i + 1 }}" [class.featured-plan]="i === 1">
+        
+        @if (i === 1) {
+          <div class="plan-badge">El más elegido</div>
+        }
 
-    <div class="plan-card-rect featured-plan animate-card delay-2">
-      <div class="plan-badge">El más elegido</div>
-      <div class="plan-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=600&auto=format&fit=crop" alt="Plan Profesional" class="plan-image">
-      </div>
-      <div class="plan-content">
-        <div class="plan-header">
-          <h3 class="plan-name text-gold">Profesional</h3>
-          <div class="plan-price">
-            <span class="currency">Bs.</span><span class="amount">199</span><span class="period">/mes</span>
-          </div>
+        <div class="plan-image-wrapper">
+          <img [src]="servicio.imagenUrl || 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop'" [alt]="servicio.nombre" class="plan-image">
         </div>
-        <p class="plan-desc">La herramienta definitiva para salones en crecimiento.</p>
-        <ul class="plan-features">
-          <li>Citas ilimitadas</li>
-          <li>Cobro automático por QR</li>
-          <li>Avisos por WhatsApp</li>
-        </ul>
-        <button class="btn-plan-solid">Seleccionar Profesional</button>
-      </div>
-    </div>
-
-    <div class="plan-card-rect animate-card delay-3">
-      <div class="plan-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?q=80&w=600&auto=format&fit=crop" alt="Plan Premium" class="plan-image">
-      </div>
-      <div class="plan-content">
-        <div class="plan-header">
-          <h3 class="plan-name">Premium</h3>
-          <div class="plan-price">
-            <span class="currency">Bs.</span><span class="amount">349</span><span class="period">/mes</span>
+        
+        <div class="plan-content">
+          <div class="plan-header">
+            <h3 class="plan-name" [class.text-gold]="i === 1">{{ servicio.nombre }}</h3>
+            <div class="plan-price">
+              <span class="currency">Bs.</span>
+              <span class="amount">{{ servicio.precio }}</span>
+              <span class="period">/{{ servicio.duracion || 'mes' }}</span>
+            </div>
           </div>
+          
+          <p class="plan-desc">{{ servicio.descripcion }}</p>
+          
+          <!-- Como tu modelo ServicioSalon no tiene array de características, puedes dejar esto vacío o estático por ahora -->
+          <ul class="plan-features">
+            <li>Servicio garantizado</li>
+            <li>Atención personalizada</li>
+          </ul>
+          
+          <!-- Estilo de botón dinámico según si es el plan destacado -->
+          <button (click)="abrirModal(servicio)"  [class]="i === 1 ? 'btn-plan-solid' : 'btn-plan-outline'" >
+            Seleccionar {{ servicio.nombre }} 
+          </button>
         </div>
-        <p class="plan-desc">Control total para salones consolidados con equipo completo.</p>
-        <ul class="plan-features">
-          <li>Historial de clientes</li>
-          <li>Hasta 8 estilistas</li>
-          <li>Reportes financieros</li>
-        </ul>
-        <button class="btn-plan-outline">Seleccionar Premium</button>
       </div>
-    </div>
-
-    <div class="plan-card-rect animate-card delay-4">
-      <div class="plan-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1600948836101-f9ffda59d250?q=80&w=600&auto=format&fit=crop" alt="Plan Élite" class="plan-image">
-      </div>
-      <div class="plan-content">
-        <div class="plan-header">
-          <h3 class="plan-name">Élite</h3>
-          <div class="plan-price">
-            <span class="currency">Bs.</span><span class="amount">599</span><span class="period">/mes</span>
-          </div>
-        </div>
-        <p class="plan-desc">Diseñado a medida para franquicias y salones de alta gama.</p>
-        <ul class="plan-features">
-          <li>Marca Blanca (Tu logo)</li>
-          <li>Sucursales ilimitadas</li>
-          <li>Soporte VIP 24/7</li>
-        </ul>
-        <button class="btn-plan-outline">Contactar Asesor</button>
-      </div>
-    </div>
+    }
 
   </div>
 </section>
@@ -161,3 +115,88 @@
     <p>&copy; 2026 Gobelet Reservé.bo - Todos los derechos reservados.</p>
   </div>
 </footer>
+
+
+
+<!--MODAL-->
+<!-- MODAL DE RESERVA PROFESIONAL -->
+@if (mostrarModal) {
+  <div class="modal-overlay">
+    <div class="modal-content-pro">
+      <button class="btn-close-pro" (click)="cerrarModal()">×</button>
+      
+      <!-- Panel Izquierdo: Información del Servicio -->
+      <div class="modal-info-panel">
+        <img [src]="servicioSeleccionado?.imagenUrl || 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop'" [alt]="servicioSeleccionado?.nombre" class="modal-img">
+        <div class="modal-info-details">
+          <h3>{{ servicioSeleccionado?.nombre }}</h3>
+          <p class="desc">{{ servicioSeleccionado?.descripcion }}</p>
+          
+          <div class="price-box">
+            <div class="price-row">
+              <span>Precio Total:</span>
+              <span>Bs. {{ total }}</span>
+            </div>
+            <div class="price-row highlight">
+              <span>Adelanto (30%):</span>
+              <span>Bs. {{ adelanto }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Derecho: Dinámico (Formulario / QR / Éxito) -->
+      <div class="modal-action-panel">
+        
+        @if (faseModal === 'formulario') {
+          <h3 class="action-title">Completa tu reserva</h3>
+          <p class="action-subtitle">Déjanos tus datos para agendar tu cita</p>
+          
+          <div class="form-group-pro">
+            <label>Nombres y Apellidos</label>
+            <input type="text" [(ngModel)]="nuevaReserva.cliente" class="form-control-pro" placeholder="Tu nombre completo">
+          </div>
+          
+          <div class="form-group-pro">
+            <label>Teléfono / WhatsApp</label>
+            <input type="number" [(ngModel)]="nuevaReserva.telefono" class="form-control-pro" placeholder="Ej: 71234567">
+          </div>
+
+          <div class="form-group-pro">
+            <label>Fecha y Hora</label>
+            <input type="datetime-local" [(ngModel)]="nuevaReserva.fechaHora" class="form-control-pro">
+          </div>
+
+          <button class="btn-plan-solid btn-full-pro" (click)="pasarAPago()">Confirmar y Generar Pago</button>
+        }
+
+        @if (faseModal === 'pago') {
+          <div class="pago-container">
+            <h3 class="action-title">Escanea para pagar</h3>
+            <p class="action-subtitle">Monto a depositar: <strong class="text-gold">Bs. {{ adelanto }}</strong></p>
+            
+            <div class="qr-wrapper">
+              <img [src]="qrCodeUrl" alt="Código QR de pago">
+            </div>
+            
+            <a [href]="qrCodeUrl" download="QR_Reserva.png" class="btn-plan-outline btn-full-pro mt-pro">Descargar QR</a>
+            
+            <div class="loader-pago">
+              <span class="spinner"></span>
+              <p class="esperando-texto">Esperando confirmación...</p>
+            </div>
+          </div>
+        }
+
+        @if (faseModal === 'exito') {
+          <div class="exito-container">
+            <img src="assets/si.png" alt="Reserva exitosa" class="logo-exito">
+            <h3 class="action-title">¡Reserva Exitosa!</h3>
+            <p class="action-subtitle">Tu pago ha sido validado y tu cita agendada correctamente.</p>
+            <button class="btn-plan-solid btn-full-pro mt-pro" (click)="cerrarModal()">Volver al inicio</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

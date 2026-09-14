@@ -1,0 +1,51 @@
+<div class="simulador-container">
+  <div class="banco-card">
+    <div class="banco-header">
+      <h2>App Banco</h2>
+      <p>descriopcion</p>
+    </div>
+
+    @if (datosReserva) {
+      <div class="detalle-pago">
+        <h3>Detalle de la transacción</h3>
+        
+        <div class="fila-detalle">
+          <span>Servicio:</span>
+          <strong>{{ datosReserva.servicioNombre }}</strong>
+        </div>
+        
+        <div class="fila-detalle">
+          <span>A nombre de:</span>
+          <strong>{{ datosReserva.cliente }}</strong>
+        </div>
+        
+        <div class="fila-total">
+          <span>Total a debitar:</span>
+          <strong class="monto-grande">Bs. {{ datosReserva.adelanto }}</strong>
+        </div>
+      </div>
+
+      @if (estadoPago === 'pendiente') {
+        <button class="btn-pagar" (click)="confirmarPago()">
+          CONFIRMAR PAGO Y TRANSFERIR
+        </button>
+      }
+
+      @if (estadoPago === 'procesando') {
+        <button class="btn-pagar procesando" disabled>
+          Procesando...
+        </button>
+      }
+
+      @if (estadoPago === 'exito') {
+        <div class="mensaje-exito">
+          <img src="assets/si.png" alt="Reserva exitosa" class="logo-exito">
+          <p>Transferencia realizada con éxito.</p>
+          <small>Puedes cerrar esta ventana, el sistema se actualizará automáticamente.</small>
+        </div>
+      }
+    } @else {
+      <p class="cargando">Buscando información del pago...</p>
+    }
+  </div>
+</div>

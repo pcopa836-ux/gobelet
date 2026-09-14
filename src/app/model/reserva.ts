@@ -1,13 +1,16 @@
 export interface Reserva {
-      id: string;
+  id?: string;
   cliente: string;
   telefono: string;
-  servicio: string;
-  estilista: string;
+  servicioId: string;
+  servicioNombre: string;
   fechaHora: string;
-  senaPagada: boolean;
-  esEcologica: boolean;
-  estado: 'Confirmada' | 'En Espera' | 'Cancelada';
+  total: number;
+  adelanto: number;
+  estado: 'Pendiente' | 'Pagado' | 'Confirmada' | 'Cancelada';
+  estilista?: string;
+  senaPagada?: boolean;
+  esEcologica?: boolean;
 }
 
 export interface ServicioSalon {

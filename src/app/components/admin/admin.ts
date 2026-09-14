@@ -7,7 +7,7 @@ import { DatabaseService } from '../../services/data-base-service';
 import { Reserva, ServicioSalon } from '../../model/reserva';
 
 @Component({
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   selector: 'app-admin',
   styleUrl: './admin.css',
   templateUrl: './admin.html',
@@ -17,73 +17,93 @@ export class Admin implements OnInit {
 
   private auth = inject(Auth);
   private router = inject(Router);
-  private dbService = inject(DatabaseService);
+  public dbService = inject(DatabaseService);
 
-  // Listas reactivas
   reservas: Reserva[] = [];
   servicios: ServicioSalon[] = [];
+  searchTerm: string = '';
+  filtroEstado: string = 'Todos';
 
-  // Control del modal/formulario para crear servicio
   mostrarModalServicio = false;
   nuevoServicio: ServicioSalon = {
-    nombre: '',
-    precio: 0,
-    duracion: '30 min',
-    imagenUrl: '',
-    descripcion: ''
+    nombre: '', precio: 0, duracion: '30 min', imagenUrl: '', descripcion: ''
   };
   private platformId = inject(PLATFORM_ID);
 
   ngOnInit(): void {
-    
-    // Cargar reservas desde Firebase
     this.dbService.getReservas().subscribe({
       next: (data) => this.reservas = data || [],
       error: (err) => console.error('Error al cargar reservas:', err)
     });
 
-    // Cargar servicios del salón desde Firebase
     this.dbService.getServicios().subscribe({
       next: (data) => this.servicios = data || [],
       error: (err) => console.error('Error al cargar servicios:', err)
     });
   }
 
+  get reservasFiltradas(): Reserva[] {
+    let filtradas = this.reservas;
+
+    if (this.filtroEstado !== 'Todos') {
+      filtradas = filtradas.filter(r => r.estado === this.filtroEstado);
+    }
+
+    if (this.searchTerm.trim() !== '') {
+      const term = this.searchTerm.toLowerCase();
+      filtradas = filtradas.filter(r => 
+        (r.cliente && r.cliente.toLowerCase().includes(term)) || 
+        String(r.telefono || '').includes(term) ||
+        (r.servicioNombre && r.servicioNombre.toLowerCase().includes(term))
+      );
+    }
+
+    return filtradas.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+  }
+  async confirmarReserva(id?: string): Promise<void> {
+    if (id) {
+      await this.dbService.actualizarEstadoReserva(id, 'Confirmada');
+    }
+  }
+
   cambiarSeccion(seccion: 'reservas' | 'servicios' | 'config'): void {
     this.seccionActual = seccion;
   }
 
-  async guardarServicio(): Promise<void> {
-    // 1. Validaciones básicas
-    /*if (!this.nuevoServicio.nombre || this.nuevoServicio.precio <= 0) {
-      alert('Por favor, ingresa al menos un nombre y un precio válido.');
-      return;
-    }*/
+  enviarWhatsApp(reserva: Reserva): void {
+    let mensaje = '';
 
+    if (reserva.estado === 'Cancelada') {
+      const motivo = prompt('Ingrese el motivo de la cancelación para informar al cliente:');
+      if (motivo === null) return; 
+      mensaje = `Hola ${reserva.cliente}, nos comunicamos de Gobelet. Lamentamos informarte que tu reserva para el servicio de ${reserva.servicioNombre} del ${reserva.fechaHora} ha sido cancelada. Motivo: ${motivo}. Si tienes dudas, puedes responder a este mensaje.`;
+    } else {
+      mensaje = `Hola ${reserva.cliente}, nos comunicamos de Gobelet para confirmar tu reserva del servicio de ${reserva.servicioNombre} para la fecha ${reserva.fechaHora}.`;
+    }
+    const url = `https://wa.me/591${reserva.telefono}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+  }
+
+  async cancelarReserva(id?: string): Promise<void> {
+    if (id && confirm('¿Estás seguro de cancelar esta reserva?')) {
+      await this.dbService.actualizarEstadoReserva(id, 'Cancelada');
+    }
+  }
+  async guardarServicio(): Promise<void> {
     try {
-      // 2. Extraemos ÚNICAMENTE los valores primitivos (aislamos a Angular)
       const payload = {
         nombre: this.nuevoServicio.nombre,
-        precio: Number(this.nuevoServicio.precio), // Forzamos a que sea un número real
+        precio: Number(this.nuevoServicio.precio),
         duracion: this.nuevoServicio.duracion || '',
         imagenUrl: this.nuevoServicio.imagenUrl || '',
         descripcion: this.nuevoServicio.descripcion || ''
       };
-
-      // 3. LA MAGIA: Forzamos la creación de un JSON 100% puro y plano.
-      // Esto elimina instantáneamente cualquier Proxy, __ngContext__ o función oculta que Angular haya inyectado.
       const servicioLimpio = JSON.parse(JSON.stringify(payload));
-
-      // 4. Enviamos el objeto sanitizado a Firebase
       await this.dbService.crearServicio(servicioLimpio);
-      
-      // 5. Cerramos el modal y limpiamos el formulario
       this.cerrarModalServicio();
-
     } catch (error) {
-      console.log(JSON.stringify(this.nuevoServicio))
       console.error('Error al guardar el servicio:', error);
-      alert('Hubo un error al guardar. Revisa la consola para más detalles.');
+      alert('Hubo un error al guardar.');
     }
   }
 

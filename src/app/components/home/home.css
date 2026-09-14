@@ -313,3 +313,214 @@
 .animate-fade-in-delay { animation: fadeIn 1s 0.4s ease forwards; opacity: 0; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { to { opacity: 1; } }
+
+
+
+/* --- MODAL PROFESIONAL (TEMA CLARO) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content-pro {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  background: #F7F3E8; /* Nuevo fondo claro */
+  width: 95%;
+  max-width: 900px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 56, 44, 0.2);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+  position: relative;
+  color: #333333; /* Texto oscuro para contraste */
+}
+
+.btn-close-pro {
+  position: absolute;
+  top: 15px; right: 20px;
+  background: rgba(15, 56, 44, 0.1);
+  border: none; 
+  color: #0f382c; /* Ícono verde */
+  font-size: 22px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.btn-close-pro:hover { 
+  background: #0f382c; 
+  color: #ffffff; 
+}
+
+/* Panel Izquierdo */
+.modal-info-panel {
+  background: #ffffff; /* Panel izquierdo en blanco puro para resaltar */
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+.modal-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+.modal-info-details {
+  padding: 30px;
+  flex-grow: 1;
+}
+.modal-info-details h3 {
+  font-size: 26px;
+  margin: 0 0 10px 0;
+  color: #0f382c; /* Título verde */
+}
+.modal-info-details .desc {
+  font-size: 14.5px;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+.price-box {
+  background: #F7F3E8; /* Mismo tono que el panel derecho */
+  border-radius: 10px;
+  padding: 18px;
+  border: 1px solid rgba(15, 56, 44, 0.15);
+}
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #555555;
+}
+.price-row.highlight {
+  margin-bottom: 0;
+  font-size: 19px;
+  font-weight: bold;
+  color: #0f382c; /* Precio en verde */
+  border-top: 1px solid rgba(15, 56, 44, 0.15);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+/* Panel Derecho */
+.modal-action-panel {
+  padding: 45px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.action-title { font-size: 24px; margin: 0 0 8px 0; color: #0f382c; }
+.action-subtitle { font-size: 15px; color: #666666; margin-bottom: 30px; }
+
+.form-group-pro { margin-bottom: 20px; }
+.form-group-pro label { display: block; margin-bottom: 8px; font-size: 14px; color: #444444; font-weight: bold; }
+.form-control-pro {
+  width: 100%; padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #333333;
+  box-sizing: border-box;
+  font-size: 15px;
+  transition: border-color 0.3s ease;
+}
+.form-control-pro:focus { 
+  outline: none; 
+  border-color: #0f382c; 
+  box-shadow: 0 0 0 3px rgba(15, 56, 44, 0.1); 
+}
+/* Se quita el filtro invertido para que el ícono del calendario sea visible en fondo claro */
+.form-control-pro::-webkit-calendar-picker-indicator { cursor: pointer; } 
+
+/* Botones */
+.btn-full-pro { 
+  width: 100%; 
+  padding: 15px; 
+  font-size: 16px; 
+  font-weight: bold; 
+  margin-top: 15px; 
+  border-radius: 8px; 
+  background-color: #0f382c; /* Botón verde */
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-full-pro:hover {
+  background-color: #174d3d;
+}
+
+.btn-plan-outline {
+  background-color: transparent;
+  color: #0f382c;
+  border: 2px solid #0f382c;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+}
+.btn-plan-outline:hover {
+  background-color: #0f382c;
+  color: #ffffff;
+}
+.mt-pro { margin-top: 25px; }
+
+/* Fase Pago y Éxito */
+.pago-container, .exito-container { text-align: center; }
+
+/* Centrado perfecto del QR */
+.qr-wrapper {
+  background: white; 
+  padding: 15px; 
+  border-radius: 12px;
+  display: block; /* Obliga a comportarse como bloque */
+  margin: 20px auto; /* Centra el bloque horizontalmente */
+  width: fit-content; /* Se ajusta exactamente al tamaño del QR */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.qr-wrapper img { display: block; max-width: 220px; }
+
+.loader-pago { margin-top: 30px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.spinner {
+  width: 22px; height: 22px;
+  border: 3px solid rgba(15, 56, 44, 0.2);
+  border-top-color: #0f382c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.esperando-texto { color: #0f382c; font-size: 15px; margin: 0; font-weight: bold; }
+
+.check-gigante-pro { font-size: 90px; margin-bottom: 20px; text-shadow: 0 0 30px rgba(76, 175, 80, 0.3); }
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .modal-content-pro { 
+    grid-template-columns: 1fr; 
+    max-height: 90vh; 
+    overflow-y: auto; 
+  }
+  .modal-img { height: 180px; }
+  .modal-action-panel { padding: 30px 25px; }
+  .btn-close-pro { top: 10px; right: 10px; background: rgba(255,255,255,0.9); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.logo-exito {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  margin: 0 auto 20px auto;
+  display: block;
+}

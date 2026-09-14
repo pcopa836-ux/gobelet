@@ -1,9 +1,6 @@
-import { Injectable, inject } from '@angular/core';
-// 1. Inyectamos la App inicializada de AngularFire
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
-// 2. Importamos listVal para observadores reactivos
 import { listVal } from '@angular/fire/database';
-// 3. Importamos los métodos nativos de Firebase
 import { getDatabase, ref, push, remove, update } from 'firebase/database';
 import { Observable } from 'rxjs';
 import { Reserva, ServicioSalon } from '../model/reserva';
@@ -12,21 +9,23 @@ import { Reserva, ServicioSalon } from '../model/reserva';
   providedIn: 'root'
 })
 export class DatabaseService {
-  // Obtenemos la instancia de la app desde el inyector de Angular
   private firebaseApp = inject(FirebaseApp);
-  // Obtenemos la base de datos nativa vinculada a esa app
   private db = getDatabase(this.firebaseApp);
+  private injector = inject(Injector);
 
-  // ==================== SECCIÓN RESERVAS ====================
+  // ==================== RESERVAS ====================
   
   getReservas(): Observable<Reserva[]> {
     const reservasRef = ref(this.db, 'reservas');
-    return listVal<Reserva>(reservasRef, { keyField: 'id' });
+    return runInInjectionContext(this.injector, () => {
+      return listVal<Reserva>(reservasRef, { keyField: 'id' });
+    });
   }
 
-  async crearReserva(reserva: Reserva): Promise<void> {
+  async crearReserva(reserva: Reserva): Promise<string> {
     const reservasRef = ref(this.db, 'reservas');
-    await push(reservasRef, reserva);
+    const nuevaReservaRef = await push(reservasRef, reserva);
+    return nuevaReservaRef.key as string;
   }
 
   async actualizarEstadoReserva(id: string, nuevoEstado: string): Promise<void> {
@@ -38,7 +37,9 @@ export class DatabaseService {
 
   getServicios(): Observable<ServicioSalon[]> {
     const serviciosRef = ref(this.db, 'servicios');
-    return listVal<ServicioSalon>(serviciosRef, { keyField: 'id' });
+    return runInInjectionContext(this.injector, () => {
+      return listVal<ServicioSalon>(serviciosRef, { keyField: 'id' });
+    });
   }
 
   async crearServicio(servicio: Omit<ServicioSalon, 'id'>): Promise<void> {

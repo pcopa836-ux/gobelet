@@ -17,7 +17,6 @@
         <span>Citas y Reservas</span>
       </button>
 
-      <!-- SECCIÓN SERVICIOS -->
       <button [class.active]="seccionActual === 'servicios'" (click)="cambiarSeccion('servicios')">
         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="6" cy="6" r="3"></circle>
@@ -57,12 +56,11 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="main-content">
 
-    <!-- VISTA 1: RESERVAS -->
     <ng-container *ngIf="seccionActual === 'reservas'">
       <header class="top-header">
         <div>
           <h1 class="page-title">Gestión de Citas</h1>
-          <p class="page-subtitle">Visualiza y controla las reservas recibidas en tiempo real.</p>
+          <p class="page-subtitle">Controlar las reservas.</p>
         </div>
         <div class="live-status"><span class="status-dot"></span> En Vivo</div>
       </header>
@@ -73,13 +71,28 @@
           <span class="metric-value">{{ reservas.length }}</span>
         </div>
         <div class="metric-card">
-          <span class="metric-title">Servicios Oferados</span>
+          <span class="metric-title">Servicios Ofertados</span>
           <span class="metric-value text-gold">{{ servicios.length }}</span>
         </div>
       </div>
 
       <section class="table-section">
-        <div class="table-header"><h2>Listado de Citas Solicitadas</h2></div>
+        <div class="table-header">
+          <h2>Listado de Citas Solicitadas</h2>
+        </div>
+
+        <!-- Controles de Búsqueda y Filtro -->
+        <div class="table-controls">
+          <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar cliente, servicio o teléfono..." class="form-control-pro search-input">
+          <select [(ngModel)]="filtroEstado" class="form-control-pro filter-select">
+            <option value="Todos">Todos los estados</option>
+            <option value="Pendiente">Pendientes</option>
+            <option value="Pagado">Pagados</option>
+            <option value="Confirmada">Confirmadas</option>
+            <option value="Cancelada">Canceladas</option>
+          </select>
+        </div>
+
         <div class="table-wrapper">
           <table class="data-table">
             <thead>
@@ -87,38 +100,49 @@
                 <th>ID</th>
                 <th>Cliente</th>
                 <th>Servicio</th>
-                <th>Estilista</th>
                 <th>Fecha / Hora</th>
-                <th>Seña QR</th>
-                <th>Eco Descuento</th>
+                <th>Total</th>
+                <th>Adelanto (30%)</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let res of reservas">
-                <td class="font-mono">{{ res.id || 'N/A' }}</td>
+              <!-- Cambiamos "reservas" por "reservasFiltradas" -->
+              <tr *ngFor="let res of reservasFiltradas">
+                <td class="font-mono">{{ (res.id | slice:0:6) || 'N/A' }}</td>
                 <td>
                   <div class="client-name">{{ res.cliente }}</div>
                   <div class="client-phone">{{ res.telefono }}</div>
                 </td>
-                <td>{{ res.servicio }}</td>
-                <td><span class="stylist-tag">{{ res.estilista }}</span></td>
+                <td>{{ res.servicioNombre }}</td>
                 <td>{{ res.fechaHora }}</td>
-                <td>
-                  <span class="badge" [ngClass]="res.senaPagada ? 'badge-success' : 'badge-warning'">
-                    {{ res.senaPagada ? 'Pagada' : 'Pendiente' }}
-                  </span>
-                </td>
-                <td>
-                  <span *ngIf="res.esEcologica" class="eco-tag">Eco 5% OFF</span>
-                  <span *ngIf="!res.esEcologica" class="text-muted">-</span>
-                </td>
+                <td>Bs. {{ res.total }}</td>
+                <td class="text-gold font-bold">Bs. {{ res.adelanto }}</td>
                 <td>
                   <span class="status-pill" [attr.data-status]="res.estado">{{ res.estado }}</span>
                 </td>
+                <div class="action-buttons">
+                    <!-- Botón Confirmar (Se oculta si ya está Confirmada o Cancelada) -->
+                    <button *ngIf="res.estado !== 'Confirmada' && res.estado !== 'Cancelada'" 
+                            class="btn-icon btn-confirmar" (click)="confirmarReserva(res.id)" title="Confirmar Reserva">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                    
+                    <!-- Botón WhatsApp (Su texto/mensaje cambia dependiendo del estado) -->
+                    <button class="btn-icon btn-whatsapp" (click)="enviarWhatsApp(res)" [title]="res.estado === 'Cancelada' ? 'Notificar Cancelación' : 'Enviar Confirmación'">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </button>
+
+                    <!-- Botón Cancelar (Se oculta si ya está Cancelada O Confirmada) -->
+                    <button *ngIf="res.estado !== 'Cancelada' && res.estado !== 'Confirmada'" 
+                            class="btn-icon btn-cancelar" (click)="cancelarReserva(res.id)" title="Cancelar Reserva">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                  </div>
               </tr>
-              <tr *ngIf="reservas.length === 0">
-                <td colspan="8" class="text-center">No hay reservas registradas en Firebase aún.</td>
+              <tr *ngIf="reservasFiltradas.length === 0">
+                <td colspan="8" class="text-center text-muted">No se encontraron reservas con esos criterios.</td>
               </tr>
             </tbody>
           </table>
