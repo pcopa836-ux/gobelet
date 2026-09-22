@@ -524,3 +524,48 @@
   margin: 0 auto 20px auto;
   display: block;
 }
+
+/* --- SELECTOR DE HORARIOS CLIENTE --- */
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
+
+.time-slot-btn {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.time-slot-btn:hover:not(:disabled) {
+  border-color: #c5a059; /* Dorado de tu marca */
+  color: #c5a059;
+}
+
+.time-slot-btn.selected {
+  background: #c5a059;
+  border-color: #c5a059;
+  color: white;
+  box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
+}
+
+.time-slot-btn.occupied {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.mt-pro { margin-top: 15px; }
+.error-text { color: #ef4444; font-size: 0.85rem; font-style: italic; margin-top: 5px; }

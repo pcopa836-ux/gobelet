@@ -24,6 +24,11 @@ export class Admin implements OnInit {
   searchTerm: string = '';
   filtroEstado: string = 'Todos';
 
+  paginaActual: number = 1;
+  itemsPorPagina: number = 10;
+
+  nuevaHora: string = '';
+
   mostrarModalServicio = false;
   nuevoServicio: ServicioSalon = {
     nombre: '', precio: 0, duracion: '30 min', imagenUrl: '', descripcion: ''
@@ -57,7 +62,7 @@ export class Admin implements OnInit {
         (r.servicioNombre && r.servicioNombre.toLowerCase().includes(term))
       );
     }
-
+    
     return filtradas.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
   }
   async confirmarReserva(id?: string): Promise<void> {
@@ -96,10 +101,17 @@ export class Admin implements OnInit {
         precio: Number(this.nuevoServicio.precio),
         duracion: this.nuevoServicio.duracion || '',
         imagenUrl: this.nuevoServicio.imagenUrl || '',
-        descripcion: this.nuevoServicio.descripcion || ''
+        descripcion: this.nuevoServicio.descripcion || '',
+        horariosDisponibles: this.nuevoServicio.horariosDisponibles || []
       };
       const servicioLimpio = JSON.parse(JSON.stringify(payload));
-      await this.dbService.crearServicio(servicioLimpio);
+
+      if (this.nuevoServicio.id) {
+        await this.dbService.actualizarServicio(this.nuevoServicio.id, servicioLimpio);
+      } else {
+        await this.dbService.crearServicio(servicioLimpio);
+      }
+      
       this.cerrarModalServicio();
     } catch (error) {
       console.error('Error al guardar el servicio:', error);
@@ -114,8 +126,36 @@ export class Admin implements OnInit {
   }
 
   abrirModalServicio(): void {
-    this.nuevoServicio = { nombre: '', precio: 0, duracion: '30 min', imagenUrl: '', descripcion: '' };
+    this.nuevoServicio = { 
+      nombre: '', precio: 0, duracion: '30 min', imagenUrl: '', descripcion: '', horariosDisponibles: [] 
+    };
+    this.nuevaHora = '';
     this.mostrarModalServicio = true;
+  }
+  abrirModalEditarServicio(servicio: ServicioSalon): void {
+    this.nuevoServicio = { 
+      ...servicio, 
+      horariosDisponibles: servicio.horariosDisponibles ? [...servicio.horariosDisponibles] : [] 
+    };
+    this.nuevaHora = '';
+    this.mostrarModalServicio = true;
+  }
+  agregarHora(): void {
+    if (this.nuevaHora) {
+      if (!this.nuevoServicio.horariosDisponibles) {
+        this.nuevoServicio.horariosDisponibles = [];
+      }
+      if (!this.nuevoServicio.horariosDisponibles.includes(this.nuevaHora)) {
+        this.nuevoServicio.horariosDisponibles.push(this.nuevaHora);
+        this.nuevoServicio.horariosDisponibles.sort(); 
+      }
+      this.nuevaHora = ''; 
+    }
+  }
+  eliminarHora(horaAElminar: string): void {
+    if (this.nuevoServicio.horariosDisponibles) {
+      this.nuevoServicio.horariosDisponibles = this.nuevoServicio.horariosDisponibles.filter(h => h !== horaAElminar);
+    }
   }
 
   cerrarModalServicio(): void {
@@ -126,4 +166,23 @@ export class Admin implements OnInit {
     await signOut(this.auth);
     this.router.navigate(['/login']);
   }
+
+
+  get totalPaginas(): number {
+    return Math.ceil(this.reservasFiltradas.length / this.itemsPorPagina);
+  }
+
+  get reservasPaginadas(): Reserva[] {
+    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
+    const fin = inicio + this.itemsPorPagina;
+    return this.reservasFiltradas.slice(inicio, fin);
+  }
+
+  cambiarPagina(direccion: number): void {
+    const nuevaPagina = this.paginaActual + direccion;
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas) {
+      this.paginaActual = nuevaPagina;
+    }
+  }
+  
 }

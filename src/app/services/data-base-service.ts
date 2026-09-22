@@ -46,6 +46,10 @@ export class DatabaseService {
     const serviciosRef = ref(this.db, 'servicios');
     await push(serviciosRef, servicio);
   }
+  async actualizarServicio(id: string, servicioActualizado: Partial<ServicioSalon>): Promise<void> {
+    const servicioRef = ref(this.db, `servicios/${id}`);
+    await update(servicioRef, servicioActualizado);
+  }
 
   async eliminarServicio(id: string): Promise<void> {
     const servicioRef = ref(this.db, `servicios/${id}`);

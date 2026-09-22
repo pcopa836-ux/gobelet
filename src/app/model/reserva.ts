@@ -20,4 +20,5 @@ export interface ServicioSalon {
   imagenUrl: string;
   duracion: string;
   descripcion?: string;
+  horariosDisponibles?: string[];
 }

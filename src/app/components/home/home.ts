@@ -3,7 +3,7 @@ import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { DatabaseService } from '../../services/data-base-service';
 import { Reserva, ServicioSalon } from '../../model/reserva';
 import { FormsModule } from '@angular/forms';
-import { getDatabase, ref, onValue } from 'firebase/database';
+import { getDatabase, ref, onValue,get } from 'firebase/database';
 import * as QRCode from 'qrcode';
 import { FirebaseApp } from '@angular/fire/app';
 import { environment } from '../../../environments/environment';
@@ -36,6 +36,10 @@ export class Home implements OnInit {
   qrCodeUrl: string = '';
   reservaIdActual: string = '';
 
+  fechaSeleccionada: string = '';
+  horaSeleccionada: string = '';
+  horariosOcupados: string[] = [];
+
   ngOnInit(): void {
     this.dbService.getServicios().subscribe({
       next: (data) => this.servicios = data || [],
@@ -55,7 +59,7 @@ export class Home implements OnInit {
   }
 
   abrirModal(servicio: ServicioSalon): void {
-  console.log('Se hizo clic en el servicio:', servicio); // <-- Agrega esto
+  console.log('Se hizo clic en el servicio:', servicio);
   this.servicioSeleccionado = servicio;
   this.total = servicio.precio;
   this.adelanto = Math.round(servicio.precio * 0.3);
@@ -65,15 +69,20 @@ export class Home implements OnInit {
   cerrarModal(): void {
     this.mostrarModal = false;
     this.nuevaReserva = { cliente: '', telefono: '', fechaHora: '' };
+    this.fechaSeleccionada = '';
+    this.horaSeleccionada = '';
+    this.horariosOcupados = [];
   }
   async pasarAPago(): Promise<void> {
-    if (!this.nuevaReserva.cliente || !this.nuevaReserva.telefono || !this.nuevaReserva.fechaHora) {
-      alert('Por favor llena todos los campos');
+    if (!this.nuevaReserva.cliente || !this.nuevaReserva.telefono || !this.fechaSeleccionada || !this.horaSeleccionada) {
+      alert('Por favor llena todos los campos y selecciona una hora disponible.');
       return;
     }
 
+    // Concatenamos fecha y hora para mantener la compatibilidad con tu modelo actual
+    this.nuevaReserva.fechaHora = `${this.fechaSeleccionada} ${this.horaSeleccionada}`;
+
     try {
-      // 1. Preparamos el objeto a guardar
       const reservaAGuardar: Reserva = {
         cliente: this.nuevaReserva.cliente,
         telefono: this.nuevaReserva.telefono,
@@ -84,18 +93,11 @@ export class Home implements OnInit {
         adelanto: this.adelanto,
         estado: 'Pendiente'
       };
-
-      // 2. Guardamos en Firebase y obtenemos el ID
+      
       this.reservaIdActual = await this.dbService.crearReserva(JSON.parse(JSON.stringify(reservaAGuardar)));
-
-      // 3. Generamos la URL secreta y el QR
       const urlPago = `${environment.baseUrl}/pago-simulado/${this.reservaIdActual}`;
       this.qrCodeUrl = await QRCode.toDataURL(urlPago, { width: 300, margin: 2 });
-
-      // 4. Cambiamos la vista
       this.faseModal = 'pago';
-
-      // 5. Nos quedamos escuchando cambios en esta reserva
       this.escucharEstadoReserva(this.reservaIdActual);
 
     } catch (error) {
@@ -105,14 +107,50 @@ export class Home implements OnInit {
   }
   escucharEstadoReserva(id: string): void {
     const reservaRef = ref(this.db, `reservas/${id}`);
-    
-    // onValue escucha en tiempo real cualquier cambio en este nodo específico
     onValue(reservaRef, (snapshot) => {
       const datos = snapshot.val();
       if (datos && datos.estado === 'Pagado') {
         this.faseModal = 'exito';
       }
     });
+  }
+
+  async onFechaChange(): Promise<void> {
+    this.horaSeleccionada = ''; 
+    this.horariosOcupados = [];
+    
+    if (!this.fechaSeleccionada || !this.servicioSeleccionado?.id) return;
+
+    // Consultamos Firebase para ver qué horas ya están tomadas ese día
+    const reservasRef = ref(this.db, 'reservas');
+    try {
+      const snapshot = await get(reservasRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const ocupadas: string[] = [];
+        
+        // Iteramos las reservas para extraer las horas ocupadas
+        Object.values(data).forEach((res: any) => {
+          // Validamos que sea el mismo servicio, que no esté cancelada y coincida la fecha
+          if (res.servicioId === this.servicioSeleccionado!.id &&
+              res.estado !== 'Cancelada' &&
+              res.fechaHora.startsWith(this.fechaSeleccionada)) {
+                
+                // Como guardaremos la fecha como "YYYY-MM-DD HH:mm", separamos por el espacio
+                const horaOcupada = res.fechaHora.split(' ')[1];
+                if (horaOcupada) ocupadas.push(horaOcupada);
+          }
+        });
+        this.horariosOcupados = ocupadas;
+      }
+    } catch (error) {
+      console.error('Error al verificar disponibilidad:', error);
+    }
+  }
+  seleccionarHora(hora: string): void {
+    if (!this.horariosOcupados.includes(hora)) {
+      this.horaSeleccionada = hora;
+    }
   }
 
 }

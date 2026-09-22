@@ -56,41 +56,43 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="main-content">
 
+    <!-- VISTA 1: RESERVAS -->
     <ng-container *ngIf="seccionActual === 'reservas'">
       <header class="top-header">
         <div>
           <h1 class="page-title">Gestión de Citas</h1>
-          <p class="page-subtitle">Controlar las reservas.</p>
+          <p class="page-subtitle">Control y seguimiento de reservas en tiempo real.</p>
         </div>
-        <div class="live-status"><span class="status-dot"></span> En Vivo</div>
+        <div class="live-status"><span class="status-dot"></span> Sincronizado</div>
       </header>
 
       <div class="metrics-grid">
         <div class="metric-card">
-          <span class="metric-title">Reservas Registradas</span>
+          <span class="metric-title">Reservas Totales</span>
           <span class="metric-value">{{ reservas.length }}</span>
         </div>
         <div class="metric-card">
-          <span class="metric-title">Servicios Ofertados</span>
+          <span class="metric-title">Servicios Activos</span>
           <span class="metric-value text-gold">{{ servicios.length }}</span>
         </div>
       </div>
 
       <section class="table-section">
         <div class="table-header">
-          <h2>Listado de Citas Solicitadas</h2>
-        </div>
-
-        <!-- Controles de Búsqueda y Filtro -->
-        <div class="table-controls">
-          <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar cliente, servicio o teléfono..." class="form-control-pro search-input">
-          <select [(ngModel)]="filtroEstado" class="form-control-pro filter-select">
-            <option value="Todos">Todos los estados</option>
-            <option value="Pendiente">Pendientes</option>
-            <option value="Pagado">Pagados</option>
-            <option value="Confirmada">Confirmadas</option>
-            <option value="Cancelada">Canceladas</option>
-          </select>
+          <h2>Listado de Solicitudes</h2>
+          
+          <div class="table-controls">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por cliente o servicio..." class="form-control-pro search-input">
+            </div>
+            <select [(ngModel)]="filtroEstado" class="form-control-pro filter-select">
+              <option value="Todos">Todos los estados</option>
+              <option value="Pendiente">Pendientes</option>
+              <option value="Confirmada">Confirmadas</option>
+              <option value="Cancelada">Canceladas</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-wrapper">
@@ -102,51 +104,61 @@
                 <th>Servicio</th>
                 <th>Fecha / Hora</th>
                 <th>Total</th>
-                <th>Adelanto (30%)</th>
+                <th>Adelanto</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                <th class="text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Cambiamos "reservas" por "reservasFiltradas" -->
-              <tr *ngFor="let res of reservasFiltradas">
-                <td class="font-mono">{{ (res.id | slice:0:6) || 'N/A' }}</td>
+              <!-- Aquí usarás reservasPaginadas cuando agregues la lógica de paginación en TS -->
+              <tr *ngFor="let res of reservasPaginadas">
+                <td class="font-mono text-muted">{{ (res.id | slice:0:6) || 'N/A' }}</td>
                 <td>
                   <div class="client-name">{{ res.cliente }}</div>
-                  <div class="client-phone">{{ res.telefono }}</div>
+                  <div class="client-phone text-muted">{{ res.telefono }}</div>
                 </td>
-                <td>{{ res.servicioNombre }}</td>
+                <td class="font-medium">{{ res.servicioNombre }}</td>
                 <td>{{ res.fechaHora }}</td>
                 <td>Bs. {{ res.total }}</td>
                 <td class="text-gold font-bold">Bs. {{ res.adelanto }}</td>
                 <td>
                   <span class="status-pill" [attr.data-status]="res.estado">{{ res.estado }}</span>
                 </td>
-                <div class="action-buttons">
-                    <!-- Botón Confirmar (Se oculta si ya está Confirmada o Cancelada) -->
+                <td class="action-cell">
+                  <!-- EL CONTENEDOR DE BOTONES AHORA ESTÁ CORRECTAMENTE DENTRO DEL TD -->
+                  <div class="action-buttons justify-end">
                     <button *ngIf="res.estado !== 'Confirmada' && res.estado !== 'Cancelada'" 
-                            class="btn-icon btn-confirmar" (click)="confirmarReserva(res.id)" title="Confirmar Reserva">
-                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            class="btn-icon btn-confirmar" (click)="confirmarReserva(res.id)" title="Confirmar">
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </button>
                     
-                    <!-- Botón WhatsApp (Su texto/mensaje cambia dependiendo del estado) -->
                     <button class="btn-icon btn-whatsapp" (click)="enviarWhatsApp(res)" [title]="res.estado === 'Cancelada' ? 'Notificar Cancelación' : 'Enviar Confirmación'">
-                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     </button>
 
-                    <!-- Botón Cancelar (Se oculta si ya está Cancelada O Confirmada) -->
                     <button *ngIf="res.estado !== 'Cancelada' && res.estado !== 'Confirmada'" 
-                            class="btn-icon btn-cancelar" (click)="cancelarReserva(res.id)" title="Cancelar Reserva">
-                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            class="btn-icon btn-cancelar" (click)="cancelarReserva(res.id)" title="Cancelar">
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                   </div>
+                </td>
               </tr>
               <tr *ngIf="reservasFiltradas.length === 0">
-                <td colspan="8" class="text-center text-muted">No se encontraron reservas con esos criterios.</td>
+                <td colspan="8" class="text-center empty-state">No se encontraron reservas con los criterios actuales.</td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- CONTROLES DE PAGINACIÓN -->
+       <div class="pagination-footer" *ngIf="reservasFiltradas.length > 0">
+  <span class="pagination-info">Mostrando {{ reservasPaginadas.length }} de {{ reservasFiltradas.length }} resultados</span>
+  <div class="pagination-actions">
+    <button class="btn-page" [disabled]="paginaActual === 1" (click)="cambiarPagina(-1)">Anterior</button>
+    <span class="page-indicator">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+    <button class="btn-page" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(1)">Siguiente</button>
+  </div>
+</div>
       </section>
     </ng-container>
 
@@ -155,25 +167,85 @@
       <header class="top-header">
         <div>
           <h1 class="page-title">Catálogo de Servicios</h1>
-          <p class="page-subtitle">Añade o modifica los servicios disponibles para los clientes.</p>
+          <p class="page-subtitle">Administra la oferta visible para tus clientes.</p>
         </div>
-        <button class="btn-primary" (click)="abrirModalServicio()">+ Nuevo Servicio</button>
+        <button class="btn-primary" (click)="abrirModalServicio()">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nuevo Servicio
+        </button>
       </header>
 
       <div class="services-grid">
         <div class="service-card" *ngFor="let s of servicios">
           <div class="service-img-wrapper">
-            <img [src]="s.imagenUrl || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400'" [alt]="s.nombre">
+            <img [src]="s.imagenUrl || 'assets/default-service.jpg'" [alt]="s.nombre">
             <span class="service-duration">{{ s.duracion }}</span>
           </div>
           <div class="service-details">
             <h3>{{ s.nombre }}</h3>
-            <p>{{ s.descripcion || 'Sin descripción disponible.' }}</p>
+            <p class="service-desc">{{ s.descripcion || 'Sin descripción detallada.' }}</p>
             <div class="service-footer">
               <span class="price-tag">Bs. {{ s.precio }}</span>
-              <button class="btn-delete" (click)="eliminarServicio(s.id)">Eliminar</button>
+              <div class="card-actions">
+                <!-- BOTÓN EDITAR AGREGADO -->
+                <button class="btn-outline-secondary btn-sm" (click)="abrirModalEditarServicio(s)">Editar</button>
+                <button class="btn-outline-danger btn-sm" (click)="eliminarServicio(s.id)">Eliminar</button>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- VISTA 3: CONFIGURACIÓN (NUEVA) -->
+    <ng-container *ngIf="seccionActual === 'config'">
+      <header class="top-header">
+        <div>
+          <h1 class="page-title">Ajustes del Sistema</h1>
+          <p class="page-subtitle">Configura los métodos de pago y datos públicos del salón.</p>
+        </div>
+        <button class="btn-primary">Guardar Cambios</button>
+      </header>
+
+      <div class="config-grid">
+        <!-- Tarjeta QR -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Método de Pago (QR)</h3>
+            <p class="text-muted">Este código se mostrará a los clientes al momento de pagar su adelanto.</p>
+          </div>
+          <div class="qr-upload-section">
+            <div class="qr-preview-box">
+              <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>Sin código QR asignado</span>
+            </div>
+            <div class="upload-actions">
+              <button class="btn-secondary">Seleccionar Imagen</button>
+              <p class="help-text">Formatos soportados: JPG, PNG (Max 2MB)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta Datos Generales -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Datos de Contacto</h3>
+            <p class="text-muted">Información visible en los mensajes y plataforma.</p>
+          </div>
+          <form class="settings-form">
+            <div class="form-group">
+              <label>Nombre del Salón</label>
+              <input type="text" class="form-control-pro" value="Gobelet">
+            </div>
+            <div class="form-group">
+              <label>Número de WhatsApp (Sin código de país)</label>
+              <input type="text" class="form-control-pro" placeholder="Ej. 71234567">
+            </div>
+            <div class="form-group">
+              <label>Mensaje de bienvenida automático</label>
+              <textarea class="form-control-pro" rows="3">¡Hola! Gracias por elegir Gobelet...</textarea>
+            </div>
+          </form>
         </div>
       </div>
     </ng-container>
@@ -181,40 +253,63 @@
   </main>
 </div>
 
-<!-- MODAL FORMULARIO DE NUEVO SERVICIO -->
+<!-- MODAL FORMULARIO DE SERVICIO (CREAR / EDITAR) -->
 <div class="modal-overlay" *ngIf="mostrarModalServicio">
   <div class="modal-card">
-    <h2>Registrar Nuevo Servicio</h2>
+    <!-- Título dinámico -->
+    <h2>{{ nuevoServicio.id ? 'Editar Servicio' : 'Registrar Nuevo Servicio' }}</h2>
+    
     <form (ngSubmit)="guardarServicio()">
       <div class="form-group">
         <label>Nombre del Servicio</label>
-        <input type="text" [(ngModel)]="nuevoServicio.nombre" name="nombre" placeholder="Ej. Corte + Peinado" required>
+        <input type="text" [(ngModel)]="nuevoServicio.nombre" name="nombre" class="form-control-pro" placeholder="Ej. Corte + Peinado" required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Precio (Bs.)</label>
-          <input type="number" [(ngModel)]="nuevoServicio.precio" name="precio" placeholder="100" required>
+          <input type="number" [(ngModel)]="nuevoServicio.precio" name="precio" class="form-control-pro" placeholder="100" required>
         </div>
         <div class="form-group">
-          <label>Duración Esti.</label>
-          <input type="text" [(ngModel)]="nuevoServicio.duracion" name="duracion" placeholder="45 min">
+          <label>Duración Estimada</label>
+          <input type="text" [(ngModel)]="nuevoServicio.duracion" name="duracion" class="form-control-pro" placeholder="Ej. 45 min">
         </div>
+      </div>
+      <div class="form-group">
+        <label>Horarios Disponibles para Reservar</label>
+        <div class="time-input-group">
+          <input type="time" [(ngModel)]="nuevaHora" name="nuevaHora" class="form-control-pro time-input">
+          <button type="button" class="btn-secondary" (click)="agregarHora()">Añadir Hora</button>
+        </div>
+        
+        <!-- Contenedor visual de horas añadidas -->
+        <div class="time-tags-container" *ngIf="nuevoServicio.horariosDisponibles && nuevoServicio.horariosDisponibles.length > 0">
+          <span class="time-tag" *ngFor="let hora of nuevoServicio.horariosDisponibles">
+            {{ hora }}
+            <button type="button" class="btn-remove-tag" (click)="eliminarHora(hora)" title="Quitar">&times;</button>
+          </span>
+        </div>
+        <p class="help-text" *ngIf="!nuevoServicio.horariosDisponibles || nuevoServicio.horariosDisponibles.length === 0">
+          No hay horarios configurados. El servicio no se podrá reservar.
+        </p>
       </div>
 
       <div class="form-group">
         <label>URL de la Foto</label>
-        <input type="url" [(ngModel)]="nuevoServicio.imagenUrl" name="imagenUrl" placeholder="https://images.unsplash.com/...">
+        <input type="url" [(ngModel)]="nuevoServicio.imagenUrl" name="imagenUrl" class="form-control-pro" placeholder="https://...">
       </div>
 
       <div class="form-group">
-        <label>Descripción</label>
-        <textarea [(ngModel)]="nuevoServicio.descripcion" name="descripcion" rows="3" placeholder="Breve descripción del tratamiento..."></textarea>
+        <label>Descripción detallada</label>
+        <textarea [(ngModel)]="nuevoServicio.descripcion" name="descripcion" class="form-control-pro" rows="3" placeholder="Breve descripción del tratamiento..."></textarea>
       </div>
 
       <div class="modal-actions">
         <button type="button" class="btn-cancel" (click)="cerrarModalServicio()">Cancelar</button>
-        <button type="submit" class="btn-primary">Guardar en Firebase</button>
+        <!-- Botón dinámico -->
+        <button type="submit" class="btn-primary">
+          {{ nuevoServicio.id ? 'Guardar Cambios' : 'Crear Servicio' }}
+        </button>
       </div>
     </form>
   </div>
